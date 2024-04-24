@@ -10,14 +10,14 @@ pragma solidity 0.8.22;
 import "@openzeppelin/contracts/interfaces/IERC20.sol";
 
 contract Escrow {
-    address public buyer;
-    address public seller;
+    address public buyer = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266;
+    address public seller = 0xa0Ee7A142d267C1f36714E4a8F75612F20a79720;
     bool private _entered;
-    uint256 public totalAmount;
+    uint256 public totalAmount = 3 ether;
     uint256 public amountDeposited;
     uint16 public percentage = 95;
     uint256 public constant MINIMUM_TIME = 4 days;
-    private bool termsAgreed;
+    bool private termsAgreed;
     uint256 public depositTime;
     mapping(address => uint256) public deposits;
     mapping(address => uint256) public withdrawals;
@@ -37,8 +37,8 @@ contract Escrow {
     // @modifier: checks if either the buyer and sender have agreed to their respective terms
     modifier agreeToTerms {
         require(msg.sender == seller || msg.sender == buyer, "Only buyer or seller can initiate this contract!");
-        require(block.timestamp >= depositTime + MINIMUM_TIME, "Minimum time (4 days) has not yet reached");
-        agreeToTerms = true;
+        // require(block.timestamp >= depositTime + MINIMUM_TIME, "Minimum time (4 days) has not yet reached");
+        termsAgreed = true;
         _;
     }
 
@@ -62,7 +62,7 @@ contract Escrow {
     }
 
     // Function for withdrawing the ether after the terms and agreements have been reached
-    function withdraw () public payable nonReentrant, agreeToTerms {
+    function withdraw () public payable nonReentrant agreeToTerms {
         require(msg.sender == seller , "Only seller can withdraw!");
         require(seller != address(0), "Seller address should be a valid address!");
         uint256 withdrawableAmount = (percentage * amountDeposited)/ 100;
