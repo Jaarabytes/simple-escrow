@@ -14,11 +14,11 @@ contract Escrow {
     address public seller = 0xa0Ee7A142d267C1f36714E4a8F75612F20a79720;
     bool private _entered;
     uint256 public totalAmount = 3 ether;
-    uint256 public amountDeposited;
+    uint256 public amountDeposited = address(this).balance;
     uint16 public percentage = 95;
-    uint256 public constant MINIMUM_TIME = 4 days;
+    uint256 public constant MINIMUM_TIME = 6 hours;
     bool private termsAgreed;
-    uint256 public depositTime;
+    uint256 public depositTime = block.timestamp;
     mapping(address => uint256) public deposits;
     mapping(address => uint256) public withdrawals;
 
@@ -37,7 +37,7 @@ contract Escrow {
     // @modifier: checks if either the buyer and sender have agreed to their respective terms
     modifier agreeToTerms {
         require(msg.sender == seller || msg.sender == buyer, "Only buyer or seller can initiate this contract!");
-        // require(block.timestamp >= depositTime + MINIMUM_TIME, "Minimum time (4 days) has not yet reached");
+        require(block.timestamp >= depositTime + MINIMUM_TIME, "Minimum time (6 hours) has not yet reached");
         termsAgreed = true;
         _;
     }
@@ -51,6 +51,7 @@ contract Escrow {
 
     // Function for buyer to deposit Ether into the escrow
     function deposit(uint256 amount) public payable nonReentrant {
+        require(msg.sender == buyer, "Only buyer can deposit!");
         require(buyer != address(0), "Buyer address must be set");
         require(msg.value > 0, "Deposit amount must be greater than zero");
         require(msg.value >= amount, "Insufficient deposit amount");
