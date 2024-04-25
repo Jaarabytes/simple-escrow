@@ -15,3 +15,8 @@ Escrow consists of:
 -   **NOTE**: The contract keeps 5% of the funds stored.
               The funds have to stay in the contract for a minimum of 6 hours.
               Enjoy!  
+
+**Tests are written using eth-brownie framework**
+
+-   **Documentation**: https://eth-brownie.readthedocs.io/en/stable/
+
